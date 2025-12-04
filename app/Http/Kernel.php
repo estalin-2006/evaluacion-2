@@ -1,0 +1,3 @@
+protected $middleware = [
+    // ...existing middleware...
+];

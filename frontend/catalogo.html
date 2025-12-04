@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catálogo Simple</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white">
+  <div class="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-900 to-gray-900">
+    <h1 class="text-4xl font-extrabold mb-8 text-blue-300 drop-shadow">Catálogo de Productos</h1>
+    <div id="product-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 w-full max-w-5xl"></div>
+  </div>
+  <script>
+    async function cargarProductos() {
+      try {
+        const res = await fetch('http://localhost:8000/api/products');
+        const productos = await res.json();
+        const lista = document.getElementById('product-list');
+        lista.innerHTML = '';
+        productos.forEach(producto => {
+          const card = document.createElement('div');
+          card.className = 'bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col items-center hover:scale-105 transition-transform duration-200';
+          card.innerHTML = `
+            <img src="${producto.image || 'https://via.placeholder.com/150'}" alt="${producto.name}" class="w-32 h-32 object-cover rounded mb-4 border-2 border-blue-400">
+            <h2 class='text-2xl font-bold mb-2 text-blue-200'>${producto.name}</h2>
+            <p class='mb-2 text-gray-300'>${producto.description}</p>
+            <span class='mt-2 text-lg font-bold text-blue-400'>${producto.price} €</span>
+          `;
+          lista.appendChild(card);
+        });
+      } catch (err) {
+        document.getElementById('product-list').innerHTML = '<p class="text-red-400">Error al cargar productos.</p>';
+      }
+    }
+    cargarProductos();
+  </script>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini Catálogo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #000;
+      color: #00f;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .login-container {
+      border: 2px solid #00f;
+      border-radius: 8px;
+      padding: 20px;
+      width: 300px;
+      background-color: #000;
+      box-shadow: 0 0 10px #00f;
+    }
+    .login-container h1 {
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    .login-container label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+    .login-container input, .login-container select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 16px;
+      border: 1px solid #00f;
+      border-radius: 4px;
+      background-color: #000;
+      color: #00f;
+    }
+    .login-container button {
+      width: 100%;
+      padding: 10px;
+      background-color: #00f;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .login-container button:hover {
+      background-color: #005;
+    }
+    .login-container a {
+      display: block;
+      text-align: center;
+      margin-top: 10px;
+      color: #00f;
+      text-decoration: none;
+    }
+    .login-container a:hover {
+      text-decoration: underline;
+    }
+    .catalog-container {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      width: 100vw;
+      min-height: 100vh;
+      background: #111;
+      color: #fff;
+    }
+    .product-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      width: 90vw;
+      margin: 30px auto;
+    }
+    .product-card {
+      background: #222;
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 0 8px #00f2;
+      color: #fff;
+    }
+    .product-card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="backend-error" style="display:none;color:red;text-align:center;margin-bottom:20px;"></div>
+  <!-- Login -->
+  <div class="login-container" id="login-container">
+    <h1>INICIAR SESIÓN</h1>
+    <form id="login-form">
+      <label for="login-email">Usuario:</label>
+      <input type="text" id="login-email" required />
+      <label for="login-password">Contraseña:</label>
+      <input type="password" id="login-password" required autocomplete="current-password" />
+      <div style="margin-bottom: 16px;">
+        <input type="checkbox" id="remember-me" />
+        <label for="remember-me">Recordarme</label>
+      </div>
+      <button type="submit">Iniciar Sesión</button>
+      <a href="#" id="register-link">Registrarse</a>
+      <a href="#">Olvidé mi contraseña</a>
+    </form>
+  </div>
+  <!-- Catálogo -->
+  <div class="catalog-container" id="catalog-container">
+    <h1>Catálogo de Productos</h1>
+    <div id="product-list" class="product-list"></div>
+  </div>
+  <script src="catalog.js"></script>
+  <script>
+    // Chequeo de backend al cargar la página
+    window.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const res = await fetch('http://localhost:8000/api/prueba');
+        if (!res.ok) throw new Error();
+      } catch {
+        document.getElementById('backend-error').style.display = 'block';
+        document.getElementById('backend-error').textContent = 'Servidor backend no disponible. Por favor, inicia el backend con "php artisan serve".';
+        document.getElementById('login-container').style.display = 'none';
+      }
+    });
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+      try {
+        const response = await fetch('http://localhost:8000/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+        });
+        if (response.status === 401) {
+          alert('Credenciales inválidas. Verifica tu usuario y contraseña.');
+          return;
+        }
+        if (!response.ok) {
+          throw new Error('Error al iniciar sesión');
+        }
+        const data = await response.json();
+        if (data.success) {
+          localStorage.setItem('authToken', data.token);
+          alert(`Inicio de sesión exitoso como ${data.role}`);
+          document.getElementById('login-container').style.display = 'none';
+          document.getElementById('catalog-container').style.display = 'flex';
+          // Aquí podrías cargar productos, etc.
+        } else {
+          alert('Credenciales inválidas.');
+        }
+      } catch (error) {
+        console.error('Error al iniciar sesión:', error);
+        alert('Error inesperado al intentar iniciar sesión.');
+      }
+    });
+  </script>
+</body>
+</html>

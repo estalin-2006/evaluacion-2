@@ -3,62 +3,69 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    // Método para el login
-    public function login(Request $request)
-    {
-        $request->validate([
-            'email' => 'required', // Puede ser email o nombre de usuario
-            'password' => 'required',
-        ]);
-
-        // Buscar el usuario por email o nombre de usuario
-        $user = User::where('email', $request->email)
-            ->orWhere('name', $request->email)
-            ->first();
-
-        // Verificar si el usuario existe y la contraseña es válida usando Hash::check
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json(['success' => false, 'message' => 'Credenciales inválidas'], 401);
-        }
-
-        // Generar un token de autenticación
-        $token = $user->createToken('authToken')->plainTextToken;
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Inicio de sesión exitoso',
-            'token' => $token,
-            'role' => $user->role,
-        ]);
-    }
-
-    // Método para el registro
+    // REGISTRO
     public function register(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
-            'role' => 'required|in:user,admin',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:6',
+            'role' => 'required|string'
         ]);
 
-        // Crear un nuevo usuario en la base de datos
+        // Crear usuario con contraseña encriptada
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => $request->password, // Guardar en texto plano (solo para pruebas)
+            'password' => Hash::make($request->password), // ENCRIPTAR
             'role' => $request->role,
         ]);
 
         return response()->json([
             'success' => true,
-            'message' => 'Usuario registrado exitosamente',
-            'user' => $user,
+            'message' => 'Usuario registrado correctamente',
+            'user' => $user
+        ], 201);
+    }
+
+    // LOGIN
+    public function login(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json(['message' => 'Credenciales incorrectas'], 401);
+        }
+
+        // Generar token (si usas Laravel Sanctum)
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Inicio de sesión exitoso',
+            'token' => $token,
+            'user' => $user
+        ]);
+    }
+
+    // LOGOUT
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Sesión cerrada'
         ]);
     }
 }

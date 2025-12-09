@@ -15,6 +15,11 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        // No crear usuarios de prueba
+        // Crear un usuario de prueba con contraseña encriptada
+        User::create([
+            'name' => 'admin',
+            'email' => 'admin@example.com',
+            'password' => Hash::make('123456') // aquí se encripta la contraseña
+        ]);
     }
 }

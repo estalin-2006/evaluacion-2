@@ -6,18 +6,17 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up()
-{
-    Schema::create('products', function (Blueprint $table) {
-        $table->id();
-        $table->string('name');
-        $table->text('description');
-        $table->decimal('price', 10, 2);
-        $table->string('image_url'); // URL que viene de Firebase
-        $table->timestamps();
-    });
-}
-
+    public function up(): void
+    {
+        Schema::create('products', function (Blueprint $table) {
+            $table->id();
+            $table->string("name");
+            $table->text("description");
+            $table->decimal("price", 10, 2);
+            $table->string("image_url");
+            $table->timestamps();
+        });
+    }
 
     public function down(): void
     {

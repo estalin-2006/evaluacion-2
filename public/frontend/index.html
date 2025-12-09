@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mini Catálogo Gamer - Login</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<style>
+body {
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    font-family: 'Inter', system-ui;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    color: #00f;
+}
+.sci-fi-box {
+    background: rgba(0,0,0,0.85);
+    border: 2px solid #00f;
+    border-radius: 1rem;
+    padding: 2rem;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 0 30px rgba(0,0,255,0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.sci-fi-header {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #00f;
+    text-shadow: 0 0 10px #00f, 0 0 20px #001a3a;
+    margin-bottom: 1.5rem;
+}
+.sci-fi-avatar {
+    margin-bottom: 1.5rem;
+}
+.sci-fi-avatar span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    font-size: 3rem;
+    border-radius: 50%;
+    border: 2px solid #00f;
+    background: rgba(0,0,0,0.7);
+    box-shadow: 0 0 20px #00f, 0 0 40px #001a3a inset;
+}
+.sci-fi-field { width: 100%; display: flex; flex-direction: column; margin-bottom: 1rem; }
+.sci-fi-field label { font-size: 0.9rem; color: #00f; margin-bottom: 0.3rem; letter-spacing: 1px; }
+.input-field {
+    background: rgba(0,0,0,0.6);
+    border: 2px solid #00f;
+    border-radius: 0.5rem;
+    color: #fff;
+    padding: 0.75rem;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+.input-field:focus { outline: none; border-color: #0ff; box-shadow: 0 0 10px #0ff; }
+.sci-fi-login {
+    background: #001a3a;
+    border: 2px solid #00f;
+    color: #00f;
+    font-weight: bold;
+    padding: 0.75rem;
+    border-radius: 0.7rem;
+    font-size: 1rem;
+    letter-spacing: 1.5px;
+    width: 100%;
+    margin-top: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.sci-fi-login:hover { background: #00f; color: #001a3a; box-shadow: 0 0 15px #00f, 0 0 30px #0ff inset; }
+.sci-fi-form { width: 100%; display: flex; flex-direction: column; transition: all 0.3s ease-in-out; }
+.hidden { display: none; }
+.flex-buttons { display: flex; gap: 1rem; margin-top: 0.5rem; }
+.flex-buttons button { flex: 1; }
+</style>
+</head>
+<body>
+
+<div class="sci-fi-box">
+    <div class="sci-fi-header">SIGN IN</div>
+    <div class="sci-fi-avatar"><span>&#128100;</span></div>
+
+    <!-- LOGIN FORM -->
+    <form id="login-form" class="sci-fi-form">
+        <div class="sci-fi-field">
+            <label for="login-email">USER NAME</label>
+            <input id="login-email" type="text" placeholder="Enter your username" class="input-field" required>
+        </div>
+        <div class="sci-fi-field">
+            <label for="login-pass">PASSWORD</label>
+            <input id="login-pass" type="password" placeholder="Enter your password" class="input-field" required>
+        </div>
+        <div class="flex-buttons">
+            <button id="btn-login" type="button" class="sci-fi-login">LOGIN</button>
+            <button id="btn-show-register" type="button" class="sci-fi-login" style="background:#00f;color:#001a3a;">REGISTER</button>
+        </div>
+    </form>
+
+    <!-- REGISTER FORM -->
+    <form id="register-form" class="sci-fi-form hidden" style="margin-top:1.5rem;">
+        <div class="sci-fi-field">
+            <label for="reg-name">FULL NAME</label>
+            <input id="reg-name" type="text" placeholder="Enter your name" class="input-field" required>
+        </div>
+        <div class="sci-fi-field">
+            <label for="reg-email">EMAIL</label>
+            <input id="reg-email" type="email" placeholder="Enter your email" class="input-field" required>
+        </div>
+        <div class="sci-fi-field">
+            <label for="reg-pass">PASSWORD</label>
+            <input id="reg-pass" type="password" placeholder="Create a password" class="input-field" required>
+        </div>
+        <div class="sci-fi-field">
+            <label for="reg-role">ROLE</label>
+            <select id="reg-role" class="input-field" required>
+                <option value="">Select role</option>
+                <option value="admin">Administrator</option>
+                <option value="operario">Operario</option>
+            </select>
+        </div>
+        <div class="flex-buttons">
+            <button id="btn-register" type="button" class="sci-fi-login">REGISTER</button>
+            <button id="btn-cancel-register" type="button" class="sci-fi-login" style="background:#222;color:#fff;">CANCEL</button>
+        </div>
+    </form>
+</div>
+
+<!-- Scripts -->
+<script type="module">
+import { loginUser, registerUser } from './catalog.js';
+
+document.addEventListener('DOMContentLoaded', () => {
+    // LOGIN / REGISTER
+    document.getElementById('btn-login').addEventListener('click', loginUser);
+    document.getElementById('btn-register').addEventListener('click', registerUser);
+
+    // SWITCH FORMS
+    const btnShowRegister = document.getElementById('btn-show-register');
+    const btnCancelRegister = document.getElementById('btn-cancel-register');
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+
+    btnShowRegister.addEventListener('click', () => {
+        loginForm.classList.add('hidden');
+        registerForm.classList.remove('hidden');
+    });
+
+    btnCancelRegister.addEventListener('click', () => {
+        registerForm.classList.add('hidden');
+        loginForm.classList.remove('hidden');
+    });
+});
+</script>
+
+</body>
+</html>

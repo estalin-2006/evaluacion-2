@@ -10,12 +10,21 @@ return new class extends Migration
     {
         Schema::create('favorites', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('product_id');
+
+            // Relación con usuario
+            $table->foreignId('user_id')
+                  ->constrained('users')
+                  ->onDelete('cascade');
+
+            // Relación con producto
+            $table->foreignId('product_id')
+                  ->constrained('products')
+                  ->onDelete('cascade');
+
             $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
+            // Evitar duplicados: el usuario no puede dar favorito 2 veces al mismo producto
+            $table->unique(['user_id', 'product_id']);
         });
     }
 
